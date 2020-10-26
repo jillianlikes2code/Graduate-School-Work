@@ -1,0 +1,59 @@
+---
+title: "612 Project"
+author: "Jillian Morgenstern"
+date: "11/30/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("haven")
+library("tidyverse")
+```
+
+```{r}
+library(foreign)
+getwd()
+setwd("/Users/jillianmorgenstern/Desktop")
+data<-read.spss("GPSS.sav", use.value.labels = TRUE, to.data.frame = TRUE)
+data<-read.spss("GPSS.sav")
+
+summary(data)
+```
+
+AGE:
+```{r}
+ggplot(data = data, mapping = aes(x = ager, fill = abortion_side)) +
+  geom_bar() +
+  xlab("Age") +
+  ylab("Count") +
+  ggtitle("Age and Abortion Position") +
+  labs(fill = "Abortion Position")
+
+ggplot(data = data, mapping = aes(x = ager, fill = abortion_legal)) +
+  geom_bar() +
+  xlab("Age")+
+  ylab("Count") +
+  ggtitle("Age and Abortion Legality") +
+  labs(fill = "Abortion Legality")
+```
+
+GENDER:
+```{r}
+ggplot(data = data, mapping = aes(x = gr, fill = abortion_side)) +
+  geom_bar() +
+  xlab("Gender") +
+  ylab("Count") +
+  ggtitle("Gender and Abortion Position") +
+  labs(fill = "Abortion Position")
+
+ggplot(data = data, mapping = aes(x = gr, fill = abortion_legal)) +
+  geom_bar() +
+  xlab("Gender") +
+  ylab("Count") +
+  ggtitle("Gender and Abortion Legality") +
+  labs(fill = "Abortion Legality")
+```

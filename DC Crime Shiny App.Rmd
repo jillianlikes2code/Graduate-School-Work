@@ -1,0 +1,84 @@
+---
+title: "Untitled"
+author: "Jillian Morgenstern"
+date: "4/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(shiny)
+library(leaflet)
+library(shinythemes)
+
+# reads in data 
+Crime_DC <-read.csv("Crime_Incidents_in_2019.csv")
+
+ui = fluidPage(theme = shinytheme("cerulean"),
+          tags$head(
+            
+
+  titlePanel("Crime in DC 2019"),         
+          ),
+          navbarPage("Crime_DC",id='nav',
+            tabPanel("Interactive Map",
+                     fluidRow(
+                      column(4,plotOutput("OFFENSE",height=300)),
+                      column(4,plotOutput("REPORT_DAT",height=300)),
+                      column(4,plotOutput("SHIFT",height=300))
+                     ),
+                     leafletOutput("mymap", width = '100%', height = '600px'),
+                     br(),
+                     absolutePanel(id = "controls",class = "panel panel-default", fixed = TRUE, draggable = TRUE,
+                                   top = 500, left = "auto", right = 20, bottom = "auto",
+                                   width = 330, height = "auto", style = "opacity: .75",
+                                           
+                                   a("data source: http://opendata.dc.gov/datasets",href="http://opendata.dc.gov/datasets"),
+                                   br(),
+                                   
+                                     
+                                  
+                                            )
+          ),
+          tabPanel("Data Explorer",
+                   dataTableOutput("table1")
+                   )
+          )
+        )
+
+server = function(input, output) {
+
+  output$mymap <- renderLeaflet({
+    # reactive expression code required here to connect with ui selection?
+  leaflet(Crime_DC) %>% 
+  addProviderTiles(providers$CartoDB.DarkMatter) %>% 
+  setView(-77.931180, 38.9072, zoom = 7) %>% 
+  addCircleMarkers(~LONGITUDE, ~LATITUDE, popup=Crime_DC$OFFENSE, weight = 3, radius=4, 
+                 stroke = F, fillOpacity = 0.5)
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+```
+
+```{r}
+setwd("/Users/jillianmorgenstern/Desktop/Data Science/DCCrime")
+Crime_DC <-read.csv("Crime_Incidents_in_2019.csv")
+library(ggplot2)
+library(rayshader)
+crimeplot = ggplot(Crime_DC) + 
+  geom_bar(aes(x = OFFENSE, fill = WARD)) 
+
+par(mfrow = c(1, 2))
+plot_gg(crimeplot, width = 10, raytrace = TRUE, preview = TRUE)
+
+plot_gg(crimeplot, width = 10, multicore = TRUE, windowsize = c(800, 800), 
+        zoom = 0.90, phi = 35, theta = 30, sunangle = 225, soliddepth = -100)
+Sys.sleep(0.2)
+render_snapshot(clear = TRUE)
+```
+
