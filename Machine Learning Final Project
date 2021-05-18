@@ -1,0 +1,93 @@
+---
+title: "Untitled"
+author: "Jillian Morgenstern"
+date: "12/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+getwd()
+train <- read.csv("train_loans.csv")
+test <- read.csv("test_loans.csv")
+```
+
+
+Logistic regression uses sigmoid function to classify variables into classes and its basically applicable to classification problems. Other applicable models for classification problems are Decision Tree, Random Forest, Naive Bayes, Neural Network and so on.
+
+For the purpose of this project we will be using Decision Tree and Random Forest along with Logistic Regression.
+```{r}
+# Fitting Logistic Regression to the Training set
+logistics_classifier = glm(formula = Loan_Status ~ .,
+                           family = binomial,
+                           data = train[,-c(1)])
+
+summary(logistics_classifier)
+plot(logistics_classifier)
+```
+Based on the output of the Logistic regression,only 3 variables are significant while other are insignificant.
+Credit_History is an important factor in deciding whether a client will default or not and this was clearly in tune with the outcome of the model. Whether the customer is married or not is also a significant factor, as far as this data set is concerned.
+
+```{r}
+library(psych)
+pairs.panels (train,
+             gap = 0,
+             bg = c("red","green","blue"[train$Credit_History]),
+             pch = 21)
+
+
+pairs.panels (test,
+             gap = 0,
+             bg = c("red","green","blue"[test$Loan_Status]),
+             pch = 21)
+
+library(corrplot)
+install.packages("corrgram")
+library(corrgram)
+library(RColorBrewer)
+corrplot(corrgram(train))
+
+```
+```{r}
+
+```
+
+Decision Tree
+```{r}
+library(party)
+Tree_Classifer = ctree(Loan_Status ~ .,
+                       data = train[,-c(1)])
+Tree_Classifer
+plot(Tree_Classifer)
+```
+corroborated the position of the logistic regression by making credit_history as the most important variable for consideration when deciding if a customer is going to default or not.
+
+Random Forest
+```{r}
+library(randomForest)
+
+set.seed(153)
+rf_classifier <- randomForest(Loan_Status ~ ., data = train[,-c(1)], na.action=na.exclude)
+
+str(rf_classifier)
+
+attributes(rf_classifier)
+plot(rf_classifier)
+```
+
+Determining the most important variable in forest
+```{r}
+varImpPlot(rf_classifier)
+```
+
+```{r}
+importance(rf_classifier)
+```
+The Random Forest model also ranked Credit_History as the most important variable just the other 2 previous models. While Random Forest agree that ApplicantIncome is another important variable; Logistics regression chose Married.
+
+```{r}
+devtools::install_github("odeleongt/postr")
+```
